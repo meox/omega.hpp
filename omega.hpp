@@ -162,6 +162,16 @@ namespace omega
 		return omega::make_list<N, S-1>(tup);
 	}
 
+	template <int N, class Tup>
+	decltype(auto) take(Tup&& tup)
+	{
+		constexpr auto S = std::tuple_size<typename std::decay<Tup>::type>::value;
+		static_assert(N >= 0 && N <= S && S > 0, "");
+
+		return omega::make_list<0, N-1>(tup);
+	}
+
+
 	/* invoke function */
 
 	template<typename Func, typename Tup, std::size_t... index>
@@ -169,7 +179,6 @@ namespace omega
 	{
 		return func(std::get<index>(std::forward<Tup>(tup))...);
 	}
-
 
 	template<typename Func, typename Tup>
 	decltype(auto) invoke(Func&& func, Tup&& tup)
