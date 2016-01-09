@@ -37,7 +37,7 @@ int main()
 }
 ```
 
-### Compiler
+### Supported Compiler
 tested with this compiler:
  - GCC 4.9.2
  - Clang 3.5 & 3.6
