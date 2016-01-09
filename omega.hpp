@@ -9,17 +9,8 @@
 
 namespace omega
 {
-    template<class T, T v>
-    struct integral_constant {
-        static constexpr T value = v;
-        typedef T value_type;
-        typedef integral_constant type;
-        constexpr operator value_type() const noexcept { return value; }
-        constexpr value_type operator()() const noexcept { return value; }
-    };
-
     template <int i>
-    using int_c = integral_constant<int, i>;
+    using int_c = std::integral_constant<int, i>;
 
     /* make_list */
 
@@ -95,6 +86,20 @@ namespace omega
     }
 
 
+    /* tail, head, take */
+    template <class Tup>
+    decltype(auto) tail(Tup&& tup)
+    {
+        constexpr auto S = std::tuple_size<typename std::decay<Tup>::type>::value;
+        return omega::make_list<1, S-1>(tup);
+    }
+
+    template <class Tup>
+    decltype(auto) head(Tup&& tup)
+    {
+        return omega::make_index_list<0>(tup);
+    }
+
     /* invoke function */
 
     template<typename Func, typename Tup, std::size_t... index>
@@ -107,9 +112,24 @@ namespace omega
     template<typename Func, typename Tup>
     decltype(auto) invoke(Func&& func, Tup&& tup)
     {
-        constexpr auto Size = std::tuple_size<typename std::decay<Tup>::type>::value;
+        constexpr auto S = std::tuple_size<typename std::decay<Tup>::type>::value;
         return invoke_helper(std::forward<Func>(func),
                              std::forward<Tup>(tup),
-                             std::make_index_sequence<Size>{});
+                             std::make_index_sequence<S>{});
+    }
+
+
+    /* utility */
+
+    template<typename Array, std::size_t... I>
+    decltype(auto) a2t_impl(const Array& a, std::index_sequence<I...>)
+    {
+        return std::make_tuple(a[I]...);
+    }
+
+    template<typename T, std::size_t N, typename Indices = std::make_index_sequence<N>>
+    decltype(auto) array2tuple(const std::array<T, N>& a)
+    {
+        return a2t_impl(a, Indices());
     }
 }
