@@ -32,7 +32,7 @@ namespace omega
     template <int B, int E, typename Tup>
     decltype(auto) make_list(Tup&& tup)
     {
-        static_assert(B < E, "");
+        static_assert(B <= E, "");
         return _make_list<B, E>(std::forward<Tup>(tup), std::is_same<int_c<B>, int_c<E>>{});
     }
 
@@ -57,7 +57,7 @@ namespace omega
     template <int B, int E, typename Tup>
     decltype(auto) make_reverse_list(Tup&& tup)
     {
-        static_assert(B > E, "");
+        static_assert(B >= E, "");
         return _make_reverse_list<B, E>(std::forward<Tup>(tup), std::is_same<int_c<B>, int_c<E>>{});
     }
 
@@ -91,13 +91,51 @@ namespace omega
     decltype(auto) tail(Tup&& tup)
     {
         constexpr auto S = std::tuple_size<typename std::decay<Tup>::type>::value;
+        static_assert(S > 1, "");
+
         return omega::make_list<1, S-1>(tup);
+    }
+
+    template <class T>
+    decltype(auto) tail(std::tuple<T>&& tup)
+    {
+        return std::make_tuple();
     }
 
     template <class Tup>
     decltype(auto) head(Tup&& tup)
     {
+        constexpr auto S = std::tuple_size<typename std::decay<Tup>::type>::value;
+        static_assert(S > 0, "");
         return omega::make_index_list<0>(tup);
+    }
+
+    template <class Tup>
+    decltype(auto) last(Tup&& tup)
+    {
+        constexpr auto S = std::tuple_size<typename std::decay<Tup>::type>::value;
+        static_assert(S > 0, "");
+        return omega::make_index_list<S-1>(tup);
+    }
+
+    template <class Tup>
+    decltype(auto) reverse(Tup&& tup)
+    {
+        constexpr auto S = std::tuple_size<typename std::decay<Tup>::type>::value;
+        static_assert(S > 0, "");
+        return omega::make_reverse_list<S-1, 0>(tup);
+    }
+
+    decltype(auto) reverse(std::tuple<>)
+    {
+        return std::make_tuple();
+    }
+
+
+    template <class Tup>
+    decltype(auto) init(Tup&& tup)
+    {
+        return tail(reverse(tup));
     }
 
     /* invoke function */
