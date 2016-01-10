@@ -208,29 +208,36 @@ namespace omega
 	// show tuple
 
 	template <int B, int E, typename Tup>
-	void _show(Tup&& tup, std::true_type)
+	void _show(std::ostream& out, Tup&& tup, std::true_type)
 	{
-		std::cout << std::get<B>(std::forward<Tup>(tup));
+		out << std::get<B>(std::forward<Tup>(tup));
 	}
 
 	template <int B, int E, typename Tup>
-	void _show(Tup&& tup, std::false_type)
+	void _show(std::ostream& out, Tup&& tup, std::false_type)
 	{
-		std::cout << std::get<B>(std::forward<Tup>(tup)) << ", ";
-		_show<B+1, E>(std::forward<Tup>(tup), std::is_same<int_c<B+1>, int_c<E>>{});
+		out << std::get<B>(std::forward<Tup>(tup)) << ", ";
+		_show<B+1, E>(out, std::forward<Tup>(tup), std::is_same<int_c<B+1>, int_c<E>>{});
 	}
 
 	template <typename Tup>
-	void show(Tup&& tup)
+	void show(std::ostream& out, Tup&& tup)
 	{
 		constexpr auto S = std::tuple_size<typename std::decay<Tup>::type>::value;
-		std::cout << "<";
-		_show<0, S-1>(std::forward<Tup>(tup), std::is_same<int_c<0>, int_c<S-1>>{});
-		std::cout << ">\n";
+		out << "<";
+		_show<0, S-1>(out, std::forward<Tup>(tup), std::is_same<int_c<0>, int_c<S-1>>{});
+		out << ">";
 	}
 
-	void show(std::tuple<>)
+	void show(std::ostream& out, std::tuple<>)
 	{
-		std::cout << "<>\n";
+		out << "<>";
 	}
+}
+
+template <typename T, typename ...Ts>
+std::ostream& operator<< (std::ostream& stream, const std::tuple<T, Ts...>& tup)
+{
+	omega::show(stream, tup);
+	return stream;
 }
