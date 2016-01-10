@@ -38,7 +38,7 @@ int main()
 }
 ```
 
-#### 2. tail, head
+#### 2. head & tail
 ```cpp
 #include <iostream>
 #include <tuple>
@@ -57,10 +57,27 @@ int main()
 }
 ```
 
+#### 3. init, last, reverse
+```cpp
+#include <iostream>
+#include <tuple>
+#include "omega.hpp"
+
+int main()
+{
+	const auto t = omega::reverse(std::make_tuple("hello", 3.14, 42));
+	std::cout << "t = " << t << std::endl; // out: t = <42, 3.14, hello>
+
+	const auto t1 = omega::last(t);
+	std::cout << "last(t) = " << t1 << std::endl; // out: last(t) = <hello>
+
+	const auto t2 = omega::init(t);
+	std::cout << "init(t) = " << t2 << std::endl; // out: init(t) = <42, 3.14>
+}
+```
 ### Supported Compiler
-tested with this compiler:
- - GCC 4.9.2
- - Clang 3.5 & 3.6
+ - GCC 4.9.2+
+ - Clang 3.5+
 
 ### How to compile
 
