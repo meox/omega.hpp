@@ -38,7 +38,7 @@ int main()
 }
 ```
 
-#### 2. head & tail
+#### 2. head, tail
 ```cpp
 #include <iostream>
 #include <tuple>
@@ -73,6 +73,23 @@ int main()
 
 	const auto t2 = omega::init(t);
 	std::cout << "init(t) = " << t2 << std::endl; // out: init(t) = <42, 3.14>
+}
+```
+
+#### 4. take, drop
+```cpp
+#include <iostream>
+#include <tuple>
+#include "omega.hpp"
+
+int main()
+{
+	const auto t = std::make_tuple(42, "wood", 5.1, "world!");
+	const auto t1 = omega::drop<1>(t);
+	std::cout << "drop<1>(t) = " << t1 << std::endl; // out: drop<1>(t) = <wood, 5.1, world!>
+
+	const auto t2 = omega::take<3>(t);
+	std::cout << "take<3>(t) = " << t2 << std::endl; // out: take<3>(t) = <42, wood, 5.1>
 }
 ```
 ### Supported Compiler
