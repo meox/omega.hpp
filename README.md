@@ -1,4 +1,4 @@
-#
+#![omega](/images/omega_logo.png).hpp
 omega.hpp is a tiny, C++14 meta-library to manipulate tuple at compile time.
 
 ### Examples
