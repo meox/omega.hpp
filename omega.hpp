@@ -18,6 +18,8 @@ namespace omega
         template <int B, int E>
             using _same_index = std::is_same<_int_c<B>, _int_c<E>>;
 
+        template <typename Tup>
+            constexpr size_t _tuple_size = std::tuple_size<typename std::remove_reference<Tup>::type>::value;
 
         /* make_list implementation */
 
@@ -147,7 +149,7 @@ namespace omega
 	template <class Tup>
 	decltype(auto) tail(Tup&& tup)
 	{
-		constexpr auto S = std::tuple_size<typename std::decay<Tup>::type>::value;
+		constexpr auto S = detail::_tuple_size<Tup>;
 		static_assert(S > 1, "");
 
 		return make_list<1, S-1>(tup);
@@ -162,7 +164,7 @@ namespace omega
 	template <class Tup>
 	decltype(auto) head(Tup&& tup)
 	{
-		constexpr auto S = std::tuple_size<typename std::decay<Tup>::type>::value;
+		constexpr auto S = detail::_tuple_size<Tup>;
 		static_assert(S > 0, "");
 		return make_index_list<0>(tup);
 	}
@@ -170,7 +172,7 @@ namespace omega
 	template <class Tup>
 	decltype(auto) last(Tup&& tup)
 	{
-		constexpr auto S = std::tuple_size<typename std::decay<Tup>::type>::value;
+		constexpr auto S = detail::_tuple_size<Tup>;
 		static_assert(S > 0, "");
 		return make_index_list<S-1>(tup);
 	}
@@ -178,7 +180,7 @@ namespace omega
 	template <class Tup>
 	decltype(auto) reverse(Tup&& tup)
 	{
-		constexpr auto S = std::tuple_size<typename std::decay<Tup>::type>::value;
+		constexpr auto S = detail::_tuple_size<Tup>;
 		static_assert(S > 0, "");
 		return make_reverse_list<S-1, 0>(tup);
 	}
@@ -201,7 +203,7 @@ namespace omega
 	template <int N, class Tup>
 	decltype(auto) drop(Tup&& tup)
 	{
-		constexpr auto S = std::tuple_size<typename std::decay<Tup>::type>::value;
+		constexpr auto S = detail::_tuple_size<Tup>;
 		static_assert(N <= S && S > 0, "");
 
 		return make_list<N, S-1>(tup);
@@ -210,7 +212,7 @@ namespace omega
 	template <int N, class Tup>
 	decltype(auto) take(Tup&& tup)
 	{
-		constexpr auto S = std::tuple_size<typename std::decay<Tup>::type>::value;
+		constexpr auto S = detail::_tuple_size<Tup>;
 		static_assert(N >= 0 && N <= S && S > 0, "");
 
 		return make_list<0, N-1>(tup);
@@ -222,7 +224,7 @@ namespace omega
 	template<typename Func, typename Tup>
 	decltype(auto) invoke(Func&& func, Tup&& tup)
 	{
-		constexpr auto S = std::tuple_size<typename std::decay<Tup>::type>::value;
+		constexpr auto S = detail::_tuple_size<Tup>;
 		return detail::_invoke(std::forward<Func>(func),
 							 std::forward<Tup>(tup),
 							 std::make_index_sequence<S>{});
@@ -242,7 +244,7 @@ namespace omega
 	template <typename Tup>
 	void show(std::ostream& out, Tup&& tup)
 	{
-		constexpr auto S = std::tuple_size<typename std::decay<Tup>::type>::value;
+		constexpr auto S = detail::_tuple_size<Tup>;
 		out << "<";
         detail::_show<0, S-1>(out, std::forward<Tup>(tup), detail::_same_index<0, S-1>{});
 		out << ">";
