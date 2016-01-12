@@ -2,6 +2,7 @@
 omega.hpp is a tiny, C++14 meta-library to manipulate tuple at compile time.
 
 ### Examples
+All examples are contained in the *driver.cpp* file
 
 #### 1. first example
 ```cpp
@@ -98,4 +99,4 @@ int main()
 
 ### How to compile
 
-g++ -O3 -std=c++1y ex.cpp -o ex
+g++ -O3 -std=c++1y driver.cpp -o ex
