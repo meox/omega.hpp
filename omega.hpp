@@ -21,51 +21,50 @@ namespace omega
         template <typename Tup>
             constexpr size_t _tuple_size = std::tuple_size<typename std::remove_reference<Tup>::type>::value;
 
-        /* make_list implementation */
+        /* make_[reverse_]list implementation */
 
-        template <int B, int E, typename Tup>
-            decltype(auto) _make_list(Tup&& tup, std::true_type)
+        //meta-function interface declaration
+        template <size_t B, size_t E, bool enabled = (B <= E)>
+            struct indexes;
+
+        //specialize for direct sequence of indexes
+        template <size_t B, size_t E>
+            struct indexes<B, E, true>
             {
-                return std::make_tuple(std::get<B>(std::forward<Tup>(tup)));
-            }
+                template <class Tup>
+                    static decltype(auto) make_list(Tup &&tup)
+                    {
+                        return std::tuple_cat (
+                            std::make_tuple(std::get<B>(std::forward<Tup>(tup))),
+                            indexes<B+1, E>::make_list(std::forward<Tup>(tup)));
 
-        template <int B, int E, typename Tup>
-            decltype(auto) _make_list(Tup&& tup, std::false_type)
+                    }
+            };
+
+        //specialize for reverse sequence of indexes
+        template <size_t B, size_t E>
+            struct indexes<B, E, false>
             {
-                return std::tuple_cat(
-                    std::make_tuple(std::get<B>(std::forward<Tup>(tup))),
-                    _make_list<B+1, E>(std::forward<Tup>(tup), _same_index<B+1, E>{})
-                    );
-            }
+                template <class Tup>
+                    static decltype(auto) make_list(Tup &&tup)
+                    {
+                        return std::tuple_cat (
+                            std::make_tuple(std::get<B>(std::forward<Tup>(tup))),
+                            indexes<B-1, E>::make_list(std::forward<Tup>(tup)));
 
-        template <int B, int E, typename Tup>
-            decltype(auto) _check_bound(Tup&& tup, std::true_type)
+                    }
+            };
+
+        //recursion termination
+        template <size_t N>
+            struct indexes<N, N, true>
             {
-                return _make_list<B, E>(std::forward<Tup>(tup), _same_index<B, E>{});
-            }
-
-        template <int B, int E, typename Tup>
-            decltype(auto) _check_bound(Tup&&, std::false_type)
-            {
-                return std::make_tuple();
-            }
-
-        /* make_reverse_list implementation */
-
-        template <int B, int E, typename Tup>
-            decltype(auto) _make_reverse_list(Tup&& tup, std::true_type)
-            {
-                return std::make_tuple(std::get<B>(std::forward<Tup>(tup)));
-            }
-
-        template <int B, int E, typename Tup>
-            decltype(auto) _make_reverse_list(Tup&& tup, std::false_type)
-            {
-                return std::tuple_cat(
-                    std::make_tuple(std::get<B>(std::forward<Tup>(tup))),
-                    _make_reverse_list<B-1, E>(std::forward<Tup>(tup), _same_index<B-1, E>{})
-                    );
-            }
+                template <class Tup>
+                    static decltype(auto) make_list (Tup &&tup)
+                    {
+                        return std::make_tuple(std::get<N>(std::forward<Tup>(tup)));
+                    }
+            };
 
         /* make_index_list implementation */
 
@@ -120,19 +119,21 @@ namespace omega
     }//namespace detail
 
 
-    /* make_list */
-	template <int B, int E, typename Tup>
-	decltype(auto) make_list(Tup&& tup)
-	{
-		return detail::_check_bound<B, E>(tup, std::integral_constant<bool, B <= E>{});
-	}
+    /* make_[reverse_]list */
 
-	template <int B, int E, typename Tup>
-	decltype(auto) make_reverse_list(Tup&& tup)
-	{
-		static_assert(B >= E, "");
-		return detail::_make_reverse_list<B, E>(std::forward<Tup>(tup), detail::_same_index<B, E>{});
-	}
+    template <int B, int E, typename Tup>
+        decltype(auto) make_list(Tup&& tup)
+        {
+            return detail::indexes<B, E>::make_list(std::forward<Tup>(tup));
+        }
+
+    /* convenience forwarder, not really necessary */
+    template <int B, int E, typename Tup>
+        decltype(auto) make_reverse_list(Tup&& tup)
+        {
+            static_assert(B >= E, "");
+            return detail::indexes<E, B>::make_list(std::forward<Tup>(tup));
+        }
 
 
 	/* make_index_list */
