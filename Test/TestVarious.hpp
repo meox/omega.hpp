@@ -1,7 +1,21 @@
-#include "omega.hpp"
+#include "omega/omega.hpp"
 
-#include <iostream>
+#include <gtest/gtest.h>
+
 #include <tuple>
+
+TEST(Omega, make_list)
+{
+    // create a tuple
+    const auto t = std::make_tuple(5, 6, 7, "yuppi!", 8, 9, 10.5);
+    const auto t1 = std::make_tuple(6, 7, "yuppi!");
+
+    // create another tuple based on t, using a list from 1 to 3 ([1,2,3])
+    auto t2 = omega::make_list<1, 3>(t); // decltype(t2) = std::tuple<int, int, const char*>
+    EXPECT_EQ(t1, t2);
+
+}
+#if 0
 
 //TODO: MAKE THIS BECOME A TEST
 namespace
@@ -83,3 +97,4 @@ int main()
     take_drop();
 }
 
+#endif
