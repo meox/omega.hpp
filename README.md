@@ -95,10 +95,10 @@ int main()
 ```
 ### Supported Platforms and Compilers:
 1. Linux:
- - GCC 4.9.2+
- - Clang 3.5+
+ - GCC 5.0.0+
+ - Clang 3.6+
 2. OSX:
- - Either Apple's provided clang (from Xcode >= 7.0) or standard Clang 3.5+
+ - Either Apple's Clang (from Xcode >= 7.0) or standard Clang 3.6+
 
 ### Requires CMake >= 3.0
 
