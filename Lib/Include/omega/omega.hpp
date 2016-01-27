@@ -131,8 +131,8 @@ namespace omega
     template <int B, int E, typename Tup>
         decltype(auto) make_reverse_list(Tup&& tup)
         {
-            static_assert(B >= E, "");
-            return detail::indexes<E, B>::make_list(std::forward<Tup>(tup));
+            static_assert(B >= E, "First Index must be >= Second Index");
+            return detail::indexes<B, E>::make_list(std::forward<Tup>(tup));
         }
 
 
@@ -153,11 +153,11 @@ namespace omega
 		constexpr auto S = detail::_tuple_size<Tup>;
 		static_assert(S > 1, "");
 
-		return make_list<1, S-1>(tup);
+		return make_list<1, S-1>(std::forward<Tup>(tup));
 	}
 
 	template <class T>
-	decltype(auto) tail(std::tuple<T>&& tup)
+	decltype(auto) tail(std::tuple<T>&&)
 	{
 		return std::make_tuple();
 	}
@@ -167,7 +167,7 @@ namespace omega
 	{
 		constexpr auto S = detail::_tuple_size<Tup>;
 		static_assert(S > 0, "");
-		return make_index_list<0>(tup);
+		return make_index_list<0>(std::forward<Tup>(tup));
 	}
 
 	template <class Tup>
@@ -175,7 +175,7 @@ namespace omega
 	{
 		constexpr auto S = detail::_tuple_size<Tup>;
 		static_assert(S > 0, "");
-		return make_index_list<S-1>(tup);
+		return make_index_list<S-1>(std::forward<Tup>(tup));
 	}
 
 	template <class Tup>
@@ -183,7 +183,7 @@ namespace omega
 	{
 		constexpr auto S = detail::_tuple_size<Tup>;
 		static_assert(S > 0, "");
-		return make_reverse_list<S-1, 0>(tup);
+		return make_reverse_list<S-1, 0>(std::forward<Tup>(tup));
 	}
 
 	decltype(auto) reverse(std::tuple<>)
@@ -195,7 +195,7 @@ namespace omega
 	template <class Tup>
 	decltype(auto) init(Tup&& tup)
 	{
-		return reverse(tail(reverse(tup)));
+		return reverse(tail(reverse(std::forward<Tup>(tup))));
 	}
 
 
@@ -207,7 +207,7 @@ namespace omega
 		constexpr auto S = detail::_tuple_size<Tup>;
 		static_assert(N <= S && S > 0, "");
 
-		return make_list<N, S-1>(tup);
+		return make_list<N, S-1>(std::forward<Tup>(tup));
 	}
 
 	template <int N, class Tup>
@@ -216,7 +216,7 @@ namespace omega
 		constexpr auto S = detail::_tuple_size<Tup>;
 		static_assert(N >= 0 && N <= S && S > 0, "");
 
-		return make_list<0, N-1>(tup);
+		return make_list<0, N-1>(std::forward<Tup>(tup));
 	}
 
 
