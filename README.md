@@ -2,7 +2,7 @@
 omega.hpp is a tiny, C++14 meta-library to manipulate tuple at compile time.
 
 ### Examples
-All examples are contained in the *driver.cpp* file
+All following examples are also implemented as google test unit tests (see *Test* folder)
 
 #### 1. first example
 ```cpp
@@ -93,10 +93,21 @@ int main()
 	std::cout << "take<3>(t) = " << t2 << std::endl; // out: take<3>(t) = <42, wood, 5.1>
 }
 ```
-### Supported Compiler
+### Supported Platforms and Compilers:
+1. Linux:
  - GCC 4.9.2+
  - Clang 3.5+
+2. OSX:
+ - Either Apple's provided clang (from Xcode >= 7.0) or standard Clang 3.5+
+
+### Requires CMake >= 3.0
 
 ### How to compile
+```bash
+mkdir BUILD
+cd BUILD
+cmake <path-to-omega.hpp-folder>
+make                        #Note: this will update the gtest submodule
+{make test | ./_Test_Omega} #i.e. either run all tests under cmake, or explicitly invoke the gtest application
+```
 
-g++ -O3 -std=c++1y driver.cpp -o ex
